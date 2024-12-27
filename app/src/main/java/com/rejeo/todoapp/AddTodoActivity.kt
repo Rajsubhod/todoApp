@@ -1,8 +1,10 @@
 package com.rejeo.todoapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -20,15 +22,13 @@ class AddTodoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+       enableEdgeToEdge()
         setContentView(R.layout.activity_add_todo)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-//        setSupportActionBar(findViewById(R.id.app_bar))
 
         val clearBtn : Button = findViewById(R.id.clear_btn)
         val goBtn : Button = findViewById(R.id.go_btn)
@@ -39,16 +39,29 @@ class AddTodoActivity : AppCompatActivity() {
         }
 
         goBtn.setOnClickListener {
-            Log.d("TODO", "Todo adding started")
-            lifecycleScope.launch(Dispatchers.IO) {
-                dbHelper.addTodo(todoField.text.toString(),false, Timestamp(System.currentTimeMillis()))
-                Log.d("TODO", "Todo added in coroutine")
-                Intent(this@AddTodoActivity, MainActivity::class.java).also {
-                    setResult(RESULT_OK)
-                    finish()
+            if(todoField.text.toString() != "") {
+
+                Log.d("TODO", "Todo adding started")
+                lifecycleScope.launch(Dispatchers.IO) {
+                    dbHelper.addTodo(
+                        todoField.text.toString(),
+                        false,
+                        Timestamp(System.currentTimeMillis())
+                    )
+                    Log.d("TODO", "Todo added in coroutine")
+                    Intent(this@AddTodoActivity, MainActivity::class.java).also {
+                        setResult(RESULT_OK)
+                        finish()
+                    }
                 }
+                Log.d("TODO", "Todo activity completed")
+            } else {
+                // Focus the field and add an error glow mark
+                todoField.requestFocus()
+                todoField.error = "This field cannot be empty"
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(todoField, InputMethodManager.SHOW_IMPLICIT)
             }
-            Log.d("TODO", "Todo activity completed")
         }
     }
 }

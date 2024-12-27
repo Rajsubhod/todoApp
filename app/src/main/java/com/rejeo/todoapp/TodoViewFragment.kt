@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -89,7 +88,6 @@ class TodoViewFragment : Fragment(R.layout.fragment_todo_view) {
         }
 
         updateOverlay.findViewById<MaterialCardView>(R.id.box).setOnClickListener {
-
         }
     }
 
@@ -109,6 +107,16 @@ class TodoViewFragment : Fragment(R.layout.fragment_todo_view) {
         updateOverlay.visibility = View.GONE
         selectedTodo = null
         editTodoText.text = null
+    }
+
+    fun updateListCompletion(newList: List<Todo>) {
+        todoList = newList
+        adapter.updateTodoView(todoList)
+    }
+
+    fun updateListDeletion(newList: List<Todo>) {
+        todoList = newList
+        adapter.TodoViewRemoved(todoList)
     }
 
 }

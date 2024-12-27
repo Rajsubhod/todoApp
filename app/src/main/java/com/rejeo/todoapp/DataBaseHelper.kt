@@ -99,13 +99,24 @@ class DataBaseHelper(var context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     fun deleteTodo(todo : Todo) {
         val db = this.writableDatabase
-        db.delete(TABLE_NAME,"${todo.id}=?", arrayOf(todo.id.toString()))
+        val result = db.delete(TABLE_NAME,"$COLUMN_id=?", arrayOf(todo.id.toString()))
+        (context as AppCompatActivity).runOnUiThread {
+            if (result == -1) {
+                Toast.makeText(context, "Deletion Failed", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Todo Removed Successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    fun deleteTodos() {
+    fun deleteTodos(todo : Todo) {
         val db = this.writableDatabase
-        val query = "TRUNCATE TABLE $TABLE_NAME;"
-        db.execSQL(query)
+//        val query = "DELETE FROM $TABLE_NAME;"
+        db.delete(TABLE_NAME,"$COLUMN_id=?", arrayOf(todo.id.toString()))
+//        db.execSQL(query)
+//        query = "DELETE FROM SQLITE_SEQUENCE WHERE name=$TABLE_NAME;"
+//        query = "UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = '$TABLE_NAME'; VACUUM;"
+//        db.execSQL(query)
         db.close()
     }
 }
