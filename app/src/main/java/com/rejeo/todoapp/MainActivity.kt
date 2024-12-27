@@ -86,26 +86,39 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.select_all -> {
                 todoList = DataBaseHelper(this).getTodos()
-                if(selectAll == 0) {
-                    selectAll = 1
-                    for (t in todoList){
-                        if(!t.isCompleted){
-                            t.isCompleted=true
+
+                if(todoList.isNotEmpty()) {
+
+                    if (selectAll == 0) {
+
+                        selectAll = 1
+                        for (t in todoList) {
+
+                            if (!t.isCompleted) {
+
+                                t.isCompleted = true
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    DataBaseHelper(this@MainActivity).updateTodo(t)
+                                }
+
+                            }
+
+                        }
+                        todoViewFragment.updateListCompletion(todoList)
+
+                    } else {
+
+                        selectAll = 0
+                        for (t in todoList) {
+                            t.isCompleted = false
                             lifecycleScope.launch(Dispatchers.IO) {
                                 DataBaseHelper(this@MainActivity).updateTodo(t)
                             }
                         }
+                        todoViewFragment.updateListCompletion(todoList)
+
                     }
-                    todoViewFragment.updateListCompletion(todoList)
-                } else {
-                    selectAll = 0
-                    for (t in todoList) {
-                        t.isCompleted = false
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            DataBaseHelper(this@MainActivity).updateTodo(t)
-                        }
-                    }
-                    todoViewFragment.updateListCompletion(todoList)
+
                 }
                 true
             }
@@ -149,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                     finish()
                 }
             })
-            .setNegativeButton("No") { dialog, which ->
+            .setNegativeButton("No") { dialog, _ ->
                 dialog.cancel()
 
             }.create().show()
